@@ -37,3 +37,23 @@ docker compose down
 **Review.** Re-ran `scripts/go.ps1 test -race -count=1 ./...` (all 9 tested packages ok) and `vet` (clean). Reviewed the gateway pipeline against the spec: no stubs remain, and fallback, release and settle paths match ADRs 0001 and 0003. No fix round was needed. Added `.superpowers/` to `.gitignore`, and put the measured bench results into `docs/DEVDOCS.md`.
 
 **Blocked.** Committing was denied by the auto-mode permission classifier on the first planning-docs commit, so all work is still uncommitted. The user must authorize commits; the planned one-per-task subjects are in the plan.
+
+## 2026-10-04 - Claude (Opus lead + Sonnet builder) - branch `main`
+
+**What changed.** Wrote and executed `docs/superpowers/plans/2026-10-04-finish.md`.
+- Committed the v0.1 tree as 8 logical commits, then one commit per finish task (local only, nothing pushed).
+- Demo stack moved to host ports 5450 (gateway), 5451 (Prometheus), 5452 (Jaeger), env-overridable; Prometheus and Jaeger images pinned (ADR 0009).
+- Compose route `local-llama` (llama3.2, not installed) became `local-ollama` -> `gemma4:12b`; the compose config is now loaded by a test.
+- Ran the host-Ollama route for the first time: opt-in `TestOllama_NonStreaming` and `TestOllama_Streaming` passed (gated on `TOLLGATE_IT_OLLAMA_URL`), and `scripts/demo.sh` passed all 8 checks including the Ollama route, 402 and 429 (`bench/results/demo-2026-10-04.txt`). Tiny demo key budget lowered to 1000 tokens so 402 is reached.
+- Review fix: the response cache is now scoped per virtual key (was shared across tenants, a cross-key leak and side channel). ADR 0004 updated, test `TestCache_ScopedPerVirtualKey`.
+- `docs/DEVDOCS.md` rewritten as a short developer guide.
+
+**What is left.** Push/remote and GitHub CI, registry publish, paid-provider runs (left for user). Stretch items from the spec. Budget can overshoot slightly if an upstream ignores `max_tokens` (documented in DEVDOCS).
+
+**How to verify.**
+```powershell
+powershell -NoProfile -File scripts/go.ps1 test -race -count=1 ./...
+powershell -NoProfile -File scripts/go.ps1 vet ./...
+docker compose up -d --build; sh scripts/demo.sh; docker compose down
+```
+Verified 2026-10-04: tests ok in 9 packages, vet clean, gofmt empty, docker build ok.

@@ -11,7 +11,7 @@
 - Per-key **budgets** in tokens and USD, enforced by worst-case reservation (`402 budget_exceeded`)
 - Per-key **token-bucket rate limits** (`429` + `Retry-After`)
 - A per-key **output cap**: `max_tokens` is rewritten so the worst case is always known
-- An **exact-match cache** (hits cost nothing, still rate-limited)
+- A per-key **exact-match cache** (hits cost nothing, still rate-limited)
 - **OpenTelemetry** spans using GenAI semantic conventions, and **Prometheus** metrics at `/metrics`
 
 ## Architecture
@@ -102,11 +102,12 @@ See `config.example.yaml`. Secrets are never in YAML: `api_key_env` and `key_env
 - [0001 Reservation budgets](docs/adr/0001-reservation-budgets.md): conservative byte bound, lower utilisation near the limit
 - [0002 In-memory state](docs/adr/0002-in-memory-state.md): one replica only, spend resets on restart
 - [0003 Fallback policy](docs/adr/0003-fallback-policy.md): no mid-stream failover
-- [0004 Exact-match cache](docs/adr/0004-exact-match-cache.md): no semantic or streaming hits
+- [0004 Exact-match cache](docs/adr/0004-exact-match-cache.md): no semantic, streaming or cross-key hits
 - [0005 Error statuses](docs/adr/0005-error-statuses.md): 402 instead of OpenAI's 429 for quota
 - [0006 GenAI attribute keys](docs/adr/0006-genai-attribute-keys.md): hand-pinned keys
 - [0007 OpenAI wire format only](docs/adr/0007-openai-wire-format-only.md): no native Anthropic yet
 - [0008 Docker-only toolchain](docs/adr/0008-docker-only-toolchain.md): slower edit-test loop
+- [0009 Host ports](docs/adr/0009-host-ports.md): demo uses 5450-5452, not the usual ports
 
 Developer docs: [docs/DEVDOCS.md](docs/DEVDOCS.md).
 
