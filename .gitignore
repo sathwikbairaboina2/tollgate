@@ -1,0 +1,9 @@
+/tollgate
+/dist/
+*.test
+*.out
+.env
+.env.*
+!.env.example
+tollgate.yaml
+.superpowers/

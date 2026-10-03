@@ -1,0 +1,4 @@
+.git
+docs
+bench/results
+*.md
