@@ -64,28 +64,32 @@ in Docker (`golang:1.25`) on the author's Windows 11 laptop. Raw results: `bench
 ## Quickstart
 Prerequisite: Docker. No local Go is needed.
 
-Full demo stack (gateway on :8787, fake upstream, Prometheus on :9090, Jaeger on :16686):
+Full demo stack (gateway on host :5450, fake upstream, Prometheus on :5451, Jaeger on :5452; the gateway listens on :8787 inside its container):
 ```sh
 docker compose up -d --build
-curl http://localhost:8787/v1/chat/completions -H "Authorization: Bearer local-demo" \
+curl http://localhost:5450/v1/chat/completions -H "Authorization: Bearer local-demo" \
   -H "Content-Type: application/json" -d '{"model":"chat-default","messages":[{"role":"user","content":"hi"}]}'
 docker compose --profile bench run --rm bench   # re-measure; writes bench/results/latest.json
 ```
-Key `local-tiny` has a 2,000-token budget and 1 req/s, to show `402` and `429`. Route `local-llama`
-uses the host's Ollama and falls back to the fake upstream when Ollama is not running.
+Key `local-tiny` has a 1,000-token budget and 1 req/s, to show `402` and `429`. Route `local-ollama`
+targets `gemma4:12b` on the host's Ollama (any pulled model works; edit `deploy/compose.tollgate.yaml`) and falls
+back to the fake upstream when Ollama is not running.
+
+Demo: with the stack up, `make demo` (or `sh scripts/demo.sh`) walks through 200, cache hit, `402`, `429`, the
+Ollama route and the metrics. Recorded output: `bench/results/demo-2026-10-04.txt`.
 
 Individual targets:
 ```sh
 make test      # go test -race ./... in golang:1.25
 make bench     # regenerates bench/results/latest.json
 make build     # docker image tollgate:dev
-TOLLGATE_DEMO_KEY=local-demo make run   # serves on :8787 using config.example.yaml
+TOLLGATE_DEMO_KEY=local-demo make run   # serves on host :5450 (container :8787) using config.example.yaml
 ```
 Without make (PowerShell): `powershell -NoProfile -File scripts/go.ps1 test -race ./...`
 
 Call it with any OpenAI client:
 ```sh
-curl http://localhost:8787/v1/chat/completions \
+curl http://localhost:5450/v1/chat/completions \
   -H "Authorization: Bearer local-demo" -H "Content-Type: application/json" \
   -d '{"model":"chat-default","messages":[{"role":"user","content":"hi"}]}'
 ```
