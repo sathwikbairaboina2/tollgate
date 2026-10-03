@@ -11,13 +11,13 @@ routes:
   - model: chat-default
     targets:
       - { provider: fake, model: gpt-4o-mini }
-  - model: local-llama
+  - model: local-ollama
     targets:
-      - { provider: ollama, model: llama3.2 }
+      - { provider: ollama, model: gemma4:12b }
       - { provider: fake, model: gpt-4o-mini }        # fallback when Ollama is not running
 pricing:
   gpt-4o-mini: { input: 0.15, output: 0.60 }
-  llama3.2: { input: 0, output: 0 }
+  gemma4:12b: { input: 0, output: 0 }
 keys:
   - id: demo
     key_env: TOLLGATE_DEMO_KEY

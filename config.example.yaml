@@ -14,7 +14,7 @@ providers:
 routes:
   - model: chat-default
     targets:
-      - { provider: ollama, model: llama3.2 }
+      - { provider: ollama, model: llama3.2 }       # any model from `ollama list` works
       # - { provider: openai, model: gpt-4o-mini }   # fallback once enabled
 
 pricing:            # USD per 1M tokens, keyed by upstream model
