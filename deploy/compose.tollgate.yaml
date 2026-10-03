@@ -26,7 +26,7 @@ keys:
     max_output_tokens: 512
   - id: tiny
     key_env: TOLLGATE_TINY_KEY
-    budget: { tokens: 2000 }                          # runs out after a few requests: demo of 402
+    budget: { tokens: 1000 }                          # runs out after a few requests: demo of 402
     rate_limit: { requests_per_second: 1, burst: 3 }  # demo of 429
     max_output_tokens: 256
 cache:

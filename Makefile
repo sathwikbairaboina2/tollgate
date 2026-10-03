@@ -28,3 +28,6 @@ build:
 run: build
 	docker run --rm -p $${TOLLGATE_PORT:-5450}:8787 -e TOLLGATE_DEMO_KEY \
 		-v "$(CURDIR)/config.example.yaml:/etc/tollgate/tollgate.yaml:ro" tollgate:dev
+
+demo:
+	sh scripts/demo.sh

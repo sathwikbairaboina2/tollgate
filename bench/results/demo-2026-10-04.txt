@@ -1,0 +1,9 @@
+PASS healthz
+PASS 200 miss
+PASS cache hit
+PASS 402 budget_exceeded after 7 requests
+PASS 429 rate_limited (Retry-After: 1s)
+PASS ollama route (model "model":"gemma4:12b", provider ollama)
+PASS metrics rejections budget_exceeded
+PASS metrics rejections rate_limited
+ALL PASS
