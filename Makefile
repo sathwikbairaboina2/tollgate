@@ -2,7 +2,7 @@ GO_IMAGE ?= golang:1.25
 DOCKER_GO = docker run --rm -v "$(CURDIR):/src" -v tollgate-gomod:/go/pkg/mod \
 	-v tollgate-gobuild:/root/.cache/go-build -w /src $(GO_IMAGE)
 
-.PHONY: test vet fmt-check tidy bench workload build run
+.PHONY: test vet fmt-check tidy bench workload build run demo
 
 test:
 	$(DOCKER_GO) go test -race ./...
@@ -26,5 +26,5 @@ build:
 	docker build -t tollgate:dev .
 
 run: build
-	docker run --rm -p 8787:8787 -e TOLLGATE_DEMO_KEY \
+	docker run --rm -p $${TOLLGATE_PORT:-5450}:8787 -e TOLLGATE_DEMO_KEY \
 		-v "$(CURDIR)/config.example.yaml:/etc/tollgate/tollgate.yaml:ro" tollgate:dev

@@ -1,5 +1,5 @@
 # Demo stack: gateway + deterministic fake upstream + Prometheus + Jaeger.
-# Ports: 8787 gateway, 9090 Prometheus, 16686 Jaeger UI. No AWS, so no LocalStack.
+# Host ports (overridable): 5450 gateway, 5451 Prometheus, 5452 Jaeger UI (ADR 0009). The gateway still listens on :8787 inside its container. No AWS, so no LocalStack.
 name: tollgate
 
 services:
@@ -12,7 +12,7 @@ services:
     build: .
     image: tollgate:dev
     depends_on: [fake-upstream, jaeger]
-    ports: ["8787:8787"]
+    ports: ["${TOLLGATE_PORT:-5450}:8787"]
     environment:
       TOLLGATE_DEMO_KEY: ${TOLLGATE_DEMO_KEY:-local-demo}
       TOLLGATE_TINY_KEY: ${TOLLGATE_TINY_KEY:-local-tiny}
@@ -23,18 +23,18 @@ services:
       - "host.docker.internal:host-gateway"
 
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v3.15.0
     command: ["--config.file=/etc/prometheus/prometheus.yml"]
     volumes:
       - ./deploy/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-    ports: ["9090:9090"]
+    ports: ["${TOLLGATE_PROM_PORT:-5451}:9090"]
     depends_on: [tollgate]
 
   jaeger:
-    image: jaegertracing/all-in-one:latest
+    image: jaegertracing/all-in-one:1.76.0
     environment:
       COLLECTOR_OTLP_ENABLED: "true"
-    ports: ["16686:16686"]
+    ports: ["${TOLLGATE_JAEGER_PORT:-5452}:16686"]
 
   bench:
     profiles: ["bench"]
