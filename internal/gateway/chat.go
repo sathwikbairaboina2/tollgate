@@ -54,7 +54,7 @@ func (g *Gateway) handleChat(w http.ResponseWriter, r *http.Request) {
 
 	cacheKey := ""
 	if g.cache != nil && !req.Stream {
-		cacheKey = cache.Key(req.Model, req.body)
+		cacheKey = cache.Key(ks.id, req.Model, req.body)
 		if g.serveCached(w, span, ks, req, cacheKey) {
 			return
 		}

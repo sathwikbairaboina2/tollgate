@@ -16,9 +16,10 @@ type Cache interface {
 	Set(key string, val []byte)
 }
 
-// Key hashes the route and the request body, ignoring fields that do not change the answer.
-// encoding/json sorts map keys, so field order does not matter.
-func Key(route string, body map[string]any) string {
+// Key hashes the scope (the virtual key id), the route and the request body, ignoring fields that
+// do not change the answer. The scope keeps one tenant from reading, or probing for, another
+// tenant's cached responses. encoding/json sorts map keys, so field order does not matter.
+func Key(scope, route string, body map[string]any) string {
 	c := make(map[string]any, len(body))
 	for k, v := range body {
 		switch k {
@@ -29,6 +30,8 @@ func Key(route string, body map[string]any) string {
 	}
 	b, _ := json.Marshal(c)
 	h := sha256.New()
+	h.Write([]byte(scope))
+	h.Write([]byte{0})
 	h.Write([]byte(route))
 	h.Write([]byte{0})
 	h.Write(b)

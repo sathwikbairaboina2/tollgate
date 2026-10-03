@@ -4,7 +4,7 @@ Date: 2026-10-03 · Status: accepted
 
 ## Decision
 
-- Cache key = SHA-256 of (route model name, canonical JSON of the request body without `stream`,
+- Cache key = SHA-256 of (virtual key id, route model name, canonical JSON of the request body without `stream`,
   `stream_options` and `user`). Go's `encoding/json` sorts map keys, so field order does not matter.
 - The key is computed **after** the `max_tokens` cap is applied, so the cap is part of the key.
 - Only 200 responses to non-streaming requests are stored, in an in-memory LRU with TTL.
@@ -15,6 +15,8 @@ Date: 2026-10-03 · Status: accepted
 
 ## What I gave up
 
+- **Cross-key sharing.** The key includes the virtual key id, so one tenant can never read (or probe
+  via `X-Tollgate-Cache: hit`) another's responses. Identical prompts from different keys each pay once.
 - **Semantic hits.** "How do I reset my password?" and "how do i reset my password" miss each other.
 - **Streaming hits.** Streaming requests always go upstream. Replaying cached SSE is stretch work.
 - **Sampling semantics.** A cached answer to a `temperature: 1` request is returned verbatim. Callers

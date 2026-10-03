@@ -65,3 +65,25 @@ func TestCache_HitsStillCountAgainstRateLimit(t *testing.T) {
 		t.Fatalf("cached request bypassed rate limit: %d", resp.StatusCode)
 	}
 }
+
+func TestCache_ScopedPerVirtualKey(t *testing.T) {
+	up := newUpstream(t, okCompletion(10, 5))
+	h := newHarness(t, oneRoute("", up.baseURL())+"  - id: team-b\n    key: tg-other-key\n"+cacheOn)
+	cacheHeader := func(auth string) string {
+		resp := h.postKey(auth, helloBody)
+		readBody(t, resp)
+		return resp.Header.Get("X-Tollgate-Cache")
+	}
+	if got := cacheHeader("Bearer " + testKey); got != "miss" {
+		t.Fatalf("key A first = %q, want miss", got)
+	}
+	if got := cacheHeader("Bearer " + testKey); got != "hit" {
+		t.Fatalf("key A second = %q, want hit", got)
+	}
+	if got := cacheHeader("Bearer tg-other-key"); got != "miss" {
+		t.Fatalf("key B saw key A's cached response: %q", got)
+	}
+	if up.hits.Load() != 2 {
+		t.Fatalf("upstream hits = %d, want 2", up.hits.Load())
+	}
+}

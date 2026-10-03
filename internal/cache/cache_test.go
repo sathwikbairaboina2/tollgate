@@ -50,7 +50,7 @@ func TestLRU_EvictsLeastRecentlyUsed(t *testing.T) {
 func TestKey_IgnoresVolatileFieldsAndOrder(t *testing.T) {
 	a := map[string]any{"model": "m", "messages": []any{"x"}, "user": "u1", "stream": false}
 	b := map[string]any{"stream": true, "messages": []any{"x"}, "model": "m", "user": "u2", "stream_options": map[string]any{"include_usage": true}}
-	if Key("r", a) != Key("r", b) {
+	if Key("s", "r", a) != Key("s", "r", b) {
 		t.Fatal("keys differ for requests that differ only in user/stream fields")
 	}
 }
@@ -58,10 +58,13 @@ func TestKey_IgnoresVolatileFieldsAndOrder(t *testing.T) {
 func TestKey_DistinguishesRouteAndContent(t *testing.T) {
 	a := map[string]any{"model": "m", "messages": []any{"x"}}
 	b := map[string]any{"model": "m", "messages": []any{"y"}}
-	if Key("r", a) == Key("r", b) {
+	if Key("s", "r", a) == Key("s", "r", b) {
 		t.Fatal("different messages share a key")
 	}
-	if Key("r1", a) == Key("r2", a) {
+	if Key("s", "r1", a) == Key("s", "r2", a) {
 		t.Fatal("different routes share a key")
+	}
+	if Key("s1", "r", a) == Key("s2", "r", a) {
+		t.Fatal("different scopes share a key")
 	}
 }
