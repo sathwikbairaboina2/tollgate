@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-10-03T09:49:43Z",
+  "go_version": "go1.25.14",
+  "os": "linux",
+  "arch": "amd64",
+  "num_cpu": 24,
+  "workload_file": "bench/workload.jsonl",
+  "workload_sha256": "7c6c2ff9a39a82a1f52c1e4f826067858e95a211debe7abcd24ca15d8a820bc6",
+  "requests": 1000,
+  "rounds": 5,
+  "upstream_delay": "0s",
+  "direct_p50_ms": 0.141,
+  "direct_p99_ms": 0.321,
+  "gateway_p50_ms": 0.27,
+  "gateway_p99_ms": 0.749,
+  "added_p50_ms": 0.12900000000000003,
+  "added_p99_ms": 0.428,
+  "cache_hits": 897,
+  "cache_hit_rate": 0.897,
+  "cost_no_cache_usd": 0.10710180000000007,
+  "cost_with_cache_usd": 0.0091524,
+  "cost_saved_pct": 91.45448535878948
+}
