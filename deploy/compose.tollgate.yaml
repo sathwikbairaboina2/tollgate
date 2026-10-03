@@ -1,0 +1,34 @@
+# Gateway config for `docker compose up`. Keys come from env vars set in docker-compose.yml.
+listen: ":8787"
+providers:
+  - name: fake
+    base_url: http://fake-upstream:9000/v1
+    timeout: 10s
+  - name: ollama
+    base_url: http://host.docker.internal:11434/v1   # shared host Ollama, optional
+    timeout: 120s
+routes:
+  - model: chat-default
+    targets:
+      - { provider: fake, model: gpt-4o-mini }
+  - model: local-llama
+    targets:
+      - { provider: ollama, model: llama3.2 }
+      - { provider: fake, model: gpt-4o-mini }        # fallback when Ollama is not running
+pricing:
+  gpt-4o-mini: { input: 0.15, output: 0.60 }
+  llama3.2: { input: 0, output: 0 }
+keys:
+  - id: demo
+    key_env: TOLLGATE_DEMO_KEY
+    budget: { usd: 1.00, tokens: 2000000 }
+    rate_limit: { requests_per_second: 20, burst: 40 }
+    max_output_tokens: 512
+  - id: tiny
+    key_env: TOLLGATE_TINY_KEY
+    budget: { tokens: 2000 }                          # runs out after a few requests: demo of 402
+    rate_limit: { requests_per_second: 1, burst: 3 }  # demo of 429
+    max_output_tokens: 256
+cache:
+  enabled: true
+  ttl: 10m

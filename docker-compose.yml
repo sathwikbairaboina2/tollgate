@@ -1,0 +1,53 @@
+# Demo stack: gateway + deterministic fake upstream + Prometheus + Jaeger.
+# Ports: 8787 gateway, 9090 Prometheus, 16686 Jaeger UI. No AWS, so no LocalStack.
+name: tollgate
+
+services:
+  fake-upstream:
+    build: .
+    image: tollgate:dev
+    entrypoint: ["/fakeupstream", "-addr", ":9000"]
+
+  tollgate:
+    build: .
+    image: tollgate:dev
+    depends_on: [fake-upstream, jaeger]
+    ports: ["8787:8787"]
+    environment:
+      TOLLGATE_DEMO_KEY: ${TOLLGATE_DEMO_KEY:-local-demo}
+      TOLLGATE_TINY_KEY: ${TOLLGATE_TINY_KEY:-local-tiny}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318
+    volumes:
+      - ./deploy/compose.tollgate.yaml:/etc/tollgate/tollgate.yaml:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  prometheus:
+    image: prom/prometheus:latest
+    command: ["--config.file=/etc/prometheus/prometheus.yml"]
+    volumes:
+      - ./deploy/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports: ["9090:9090"]
+    depends_on: [tollgate]
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports: ["16686:16686"]
+
+  bench:
+    profiles: ["bench"]
+    image: golang:1.25
+    working_dir: /src
+    volumes:
+      - .:/src
+      - gomod:/go/pkg/mod
+      - gobuild:/root/.cache/go-build
+    command: ["go", "run", "./bench", "-workload", "bench/workload.jsonl", "-out", "bench/results/latest.json"]
+
+volumes:
+  gomod:
+    name: tollgate-gomod
+  gobuild:
+    name: tollgate-gobuild
