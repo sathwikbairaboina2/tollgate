@@ -5,7 +5,7 @@
 **An OpenAI-compatible LLM gateway in Go that adds 0.13 ms p50 / 0.43 ms p99 and cut cost 91% with its exact-match cache on a replayed 1000-request synthetic workload, while enforcing every budget before a byte leaves.**
 
 <!-- readme-header -->
-[![CI](https://github.com/sathwikbairaboina2/tollgate/actions/workflows/ci.yml/badge.svg)](https://github.com/sathwikbairaboina2/tollgate/actions/workflows/ci.yml) ![Go](https://img.shields.io/badge/-Go-555) ![OpenTelemetry](https://img.shields.io/badge/-OpenTelemetry-555) ![Prometheus](https://img.shields.io/badge/-Prometheus-555)
+[![CI](https://github.com/sathwikbairaboina2/tollgate/actions/workflows/ci.yml/badge.svg)](https://github.com/sathwikbairaboina2/tollgate/actions/workflows/ci.yml) ![License: MIT](https://img.shields.io/badge/license-MIT-blue) ![Go](https://img.shields.io/badge/-Go-555) ![OpenTelemetry](https://img.shields.io/badge/-OpenTelemetry-555) ![Prometheus](https://img.shields.io/badge/-Prometheus-555)
 
 | Measured | Source |
 |---|---|
