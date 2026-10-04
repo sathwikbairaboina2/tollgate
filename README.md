@@ -1,6 +1,16 @@
-# Tollgate
+# 🚦 Tollgate
+
+> LLM gateway in Go. Budgets, rate limits and caching enforced before any request leaves.
 
 **An OpenAI-compatible LLM gateway in Go that adds 0.13 ms p50 / 0.43 ms p99 and cut cost 91% on a replayed 1000-request workload, while enforcing every budget before a byte leaves.**
+
+<!-- readme-header -->
+[![CI](https://github.com/sathwikbairaboina2/tollgate/actions/workflows/ci.yml/badge.svg)](https://github.com/sathwikbairaboina2/tollgate/actions/workflows/ci.yml) ![Go](https://img.shields.io/badge/-Go-555) ![OpenTelemetry](https://img.shields.io/badge/-OpenTelemetry-555) ![Prometheus](https://img.shields.io/badge/-Prometheus-555)
+
+| Measured | Source |
+|---|---|
+| **+0.129 ms p50** | `bench/results/latest.json` |
+| **91.5% cost cut** | `bench/results/latest.json` |
 
 > The model proposes, the deterministic core disposes. Keys, money and limits are decided by
 > code with tests, before any upstream sees the request.
