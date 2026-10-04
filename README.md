@@ -2,7 +2,7 @@
 
 > LLM gateway in Go. Budgets, rate limits and caching enforced before any request leaves.
 
-**An OpenAI-compatible LLM gateway in Go that adds 0.13 ms p50 / 0.43 ms p99 and cut cost 91% on a replayed 1000-request workload, while enforcing every budget before a byte leaves.**
+**An OpenAI-compatible LLM gateway in Go that adds 0.13 ms p50 / 0.43 ms p99 and cut cost 91% with its exact-match cache on a replayed 1000-request synthetic workload, while enforcing every budget before a byte leaves.**
 
 <!-- readme-header -->
 [![CI](https://github.com/sathwikbairaboina2/tollgate/actions/workflows/ci.yml/badge.svg)](https://github.com/sathwikbairaboina2/tollgate/actions/workflows/ci.yml) ![Go](https://img.shields.io/badge/-Go-555) ![OpenTelemetry](https://img.shields.io/badge/-OpenTelemetry-555) ![Prometheus](https://img.shields.io/badge/-Prometheus-555)
@@ -17,7 +17,7 @@
 
 ## What it does
 - `/v1/chat/completions`, streaming (SSE) and non-streaming, OpenAI wire format in and out
-- Routes a public model name to an ordered list of upstreams (OpenAI, Groq, vLLM, Ollama, ...) and falls back on 429, 5xx and transport errors
+- Routes a public model name to an ordered list of OpenAI-compatible upstreams (OpenAI, Groq, vLLM, Ollama, ...) and falls back on 429, 5xx and transport errors
 - Per-key **budgets** in tokens and USD, enforced by worst-case reservation (`402 budget_exceeded`)
 - Per-key **token-bucket rate limits** (`429` + `Retry-After`)
 - A per-key **output cap**: `max_tokens` is rewritten so the worst case is always known
@@ -97,13 +97,8 @@ TOLLGATE_DEMO_KEY=local-demo make run   # serves on host :5450 (container :8787)
 ```
 Without make (PowerShell): `powershell -NoProfile -File scripts/go.ps1 test -race ./...`
 
-Call it with any OpenAI client:
-```sh
-curl http://localhost:5450/v1/chat/completions \
-  -H "Authorization: Bearer local-demo" -H "Content-Type: application/json" \
-  -d '{"model":"chat-default","messages":[{"role":"user","content":"hi"}]}'
-```
-With Ollama on the host, set `base_url: http://host.docker.internal:11434/v1` in the mounted config.
+Any OpenAI client works: set its base URL to `http://localhost:5450/v1` and use a virtual key (for example `local-demo`) as the API key.
+`config.example.yaml` points at Ollama on `localhost:11434`; under `make run` (inside Docker) change `base_url` to `http://host.docker.internal:11434/v1`.
 
 ## Configuration
 See `config.example.yaml`. Secrets are never in YAML: `api_key_env` and `key_env` name env vars.
